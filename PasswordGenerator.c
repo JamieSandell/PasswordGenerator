@@ -7,7 +7,8 @@
 
 #define DEFAULT_PASSWORD_LENGTH 8
 
-char get_random_char(char *character_set);
+char get_random_char(const char *character_set);
+int get_random_number(int start_of_range, int end_of_range);
 
 int main(int argc, char *argv[])
 {
@@ -47,25 +48,47 @@ int main(int argc, char *argv[])
         password_length = conversion;
     }
 
-    char *password = (char *) malloc(password_length); // Allocate the memory for our password
+    char *password = (char *) malloc(password_length + 1); // Allocate the memory for our password, + 1 for null terminating character
     static const char *const character_sets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", // https://stackoverflow.com/questions/1200690/c-how-to-correctly-declare-an-array-of-strings
                                                     "abcdefghijklmnopqrstuvwxyz",
                                                     "0123456789",
                                                     "!£$%^&*()`;:@'~#<>?,."};
-    char test = get_random_char(character_sets[0]);
-    fprintf(stdout, "%c", test);
+    srand(time(0)); // Seed the rand with the current time
+    unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
+    
+    /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
+    that a password must have upper case, lower case, numeric and a special characters */
+    int position = 0;
+    for (; position < number_of_rows; ++position)
+    {
+        *(password + position) = get_random_char(character_sets[position]);
+    }
+    // set the rest of the password
+    int random_character_set;
+    for (; position < password_length; ++position)
+    {
+        random_character_set = get_random_number(0, number_of_rows - 1);
+        *(password + position) = get_random_char(character_sets[random_character_set]);
+    }
+    *(password + position) = '\0';
+    fprintf(stdout, "%s\n", password);
     free(password); // Make sure we free what the dynamically allocated
 
     return EXIT_SUCCESS;
 }
 
 // Gets a random character from the passed in pointer to a character set. The character set must be null terminated.
-char get_random_char(char *character_set)
-{
-    srand(time(0)); // Seed the rand with the current time
+char get_random_char(const char *character_set)
+{    
     size_t character_set_length = strlen(character_set);
-    int start_range = 0;
-    int end_range = character_set_length - 1;
-    int random_number = (rand() % (end_range - start_range + 1)) + start_range;
+    int start_of_range = 0;
+    int end_of_range = character_set_length - 1;
+    int random_number = get_random_number(start_of_range, end_of_range);
     return *(character_set + random_number);
+}
+
+// Gets a random number from start_of_range (inclusive) to end_of_range (inclusive).
+int get_random_number(int start_of_range, int end_of_range)
+{
+    return (rand() % (end_of_range - start_of_range + 1)) + start_of_range;
 }
