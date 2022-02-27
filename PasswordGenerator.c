@@ -5,8 +5,8 @@
 #include <string.h>
 #include <time.h>
 
-#define DEFAULT_PASSWORD_LENGTH 16
-#define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 10
+#define DEFAULT_PASSWORD_LENGTH 8
+#define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 1
 #define MINIMUM_PASSWORD_LENGTH 8
 #define MAXIMUM_PASSWORD_LENGTH 16
 
@@ -56,8 +56,7 @@ int main(int argc, char *argv[])
     time(&begin);*/
     for (long password_count = 0; password_count < number_of_passwords_to_generate; ++password_count)
     {
-        position = 0;
-        for (; position < number_of_rows; ++position)
+        for (position = 0; position < number_of_rows; ++position)
         {
             *(password + position) = get_random_char(character_sets[position]);
         }
