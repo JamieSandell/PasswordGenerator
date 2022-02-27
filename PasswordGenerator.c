@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
                                                     "!£$%^&*()`;:@'~#<>?,."};
     srand(time(0)); // Seed the rand with the current time
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
+    fprintf(stdout, "Number of character sets: %u\n", number_of_rows);
     
     /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
     that a password must have upper case, lower case, numeric and a special characters */
@@ -129,9 +130,11 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
 char get_random_char(const char *character_set)
 {    
     size_t character_set_length = strlen(character_set);
+    fprintf(stdout, "character_set_length = %zu\n", character_set_length);
     int start_of_range = 0;
     int end_of_range = character_set_length - 1;
     int random_number = get_random_number(start_of_range, end_of_range);
+    fprintf(stdout, "random_number = %i\n", random_number);
     return *(character_set + random_number);
 }
 
