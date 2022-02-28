@@ -8,7 +8,10 @@
 #define DEFAULT_PASSWORD_LENGTH 8
 #define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 10
 #define MINIMUM_PASSWORD_LENGTH 8
-#define MAXIMUM_PASSWORD_LENGTH 16
+#define MAXIMUM_PASSWORD_LENGTH 32
+#define MAXIMUM_COMMAND_LINE_ARGUMENTS 3
+#define MINIMUM_PASSWORDS_TO_GENERATE 1
+#define MAXIMUM_PASSWORDS_TO_GENERATE LONG_MAX
 
 long convert_command_line_argument(const char *argument, unsigned int command_line_index);
 char get_random_char(const char *character_set);
@@ -16,16 +19,17 @@ int get_random_number(int start_of_range, int end_of_range);
 
 int main(int argc, char *argv[])
 {
-    if (argc > 2) // Too many arguments passed in
+    if (argc > MAXIMUM_COMMAND_LINE_ARGUMENTS)
     {
-        fprintf(stdout, "%s\n", "Usage: PasswordGenerator a b, where:");
-        fprintf(stdout, "a is 8 or more characters to generate (default is 8 if no flags specified)\n");
-        fprintf(stdout, "b is the number of passwords to generate (default is %i)");
+        fprintf(stdout, "Usage: PasswordGenerator a b, where:\n");
+        fprintf(stdout, "a is between %i and %i characters to generate (default is %i if no flags specified)\n", MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH, DEFAULT_PASSWORD_LENGTH);
+        fprintf(stdout, "b is the number of passwords to generate (default is %i)\n", DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE);
+        fprintf(stdout, "PasswordGenerator 8 10 would generate 8 passwords of 10 character length.\n");
         return EXIT_FAILURE;
     }
     int password_length = DEFAULT_PASSWORD_LENGTH;
     long number_of_passwords_to_generate = DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE;
-    if (argc == 2)
+    if (argc > 1)
     {        
         password_length = convert_command_line_argument(argv[1], 1);
         if (!password_length)
@@ -33,7 +37,7 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-    else if (argc == 3)
+    if (argc == 3)
     {
         number_of_passwords_to_generate = convert_command_line_argument(argv[2], 2);
         if (!number_of_passwords_to_generate)
@@ -52,9 +56,10 @@ int main(int argc, char *argv[])
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
     
     /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
-    that a password must have upper case, lower case, numeric and a special characters */
+    that a password must have upper case, lower case, numeric and a special characters, after that the remaining
+    characters to generate are pulled at random from a random character set. */
     int position;
-    // Start measuring time
+    // Start measuring time - uncomment the time_t code to see how long it takes to generate
     /*time_t begin, end;
     time(&begin);*/
     for (long password_count = 0; password_count < number_of_passwords_to_generate; ++password_count)
@@ -71,7 +76,7 @@ int main(int argc, char *argv[])
             *(password + position) = get_random_char(character_sets[random_character_set]);
         }
         *(password + position) = '\0';
-        fprintf(stdout, "%s\n", password);
+        fprintf(stdout, "%s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
     }
     // Stop measuring time and calculate the elapsed time
     // This will measure the wall clock on both Winodws & Linux, but only in full seconds.
@@ -87,8 +92,8 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
 {
     errno = 0;
     char *end_ptr;
-    long conversion = strtol(argument, &end_ptr, 10); //strtol as strtoi has no error checking, as any invalid input is treated as 0
-    /* strtol only sets errno for overflow conditions, not to indicate parsing failures.
+    long conversion = strtoul(argument, &end_ptr, 10); /* strtoul as strtoi has no error checking, as any invalid input is treated as 0
+        strtol only sets errno for overflow conditions, not to indicate parsing failures.
         For that purpose, you have to check the value of the end pointer, but you need to store a pointer to the original string. */
     if (errno != 0)
     {
@@ -115,9 +120,9 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
             }
             break;
         case 2:
-            if (conversion < LONG_MIN || conversion > LONG_MAX)
+            if (conversion < MINIMUM_PASSWORDS_TO_GENERATE || conversion > MAXIMUM_PASSWORDS_TO_GENERATE)
             {
-                fprintf(stderr, "Error: Command line argument 2 must be between %lf and %ld but it is %ld\n", LONG_MIN, LONG_MAX, conversion);
+                fprintf(stderr, "Error: Command line argument 2 must be between %i and %ld but it is %ld\n", MINIMUM_PASSWORDS_TO_GENERATE, MAXIMUM_PASSWORDS_TO_GENERATE, conversion);
                 return 0;
             }
             break;
