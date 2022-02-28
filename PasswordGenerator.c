@@ -6,7 +6,7 @@
 #include <time.h>
 
 #define DEFAULT_PASSWORD_LENGTH 8
-#define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 1
+#define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 10
 #define MINIMUM_PASSWORD_LENGTH 8
 #define MAXIMUM_PASSWORD_LENGTH 16
 
@@ -18,7 +18,9 @@ int main(int argc, char *argv[])
 {
     if (argc > 2) // Too many arguments passed in
     {
-        printf("%s\n", "Usage: PasswordGenerator n, where n is 8 or more characters to generate (default is 8 if no flags specified)");
+        fprintf(stdout, "%s\n", "Usage: PasswordGenerator a b, where:");
+        fprintf(stdout, "a is 8 or more characters to generate (default is 8 if no flags specified)\n");
+        fprintf(stdout, "b is the number of passwords to generate (default is %i)");
         return EXIT_FAILURE;
     }
     int password_length = DEFAULT_PASSWORD_LENGTH;
@@ -44,10 +46,10 @@ int main(int argc, char *argv[])
     static const char *const character_sets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", // https://stackoverflow.com/questions/1200690/c-how-to-correctly-declare-an-array-of-strings
                                                     "abcdefghijklmnopqrstuvwxyz",
                                                     "0123456789",
-                                                    "!Â£$%^&*()`;:@'~#<>?,."};
+                                                    "!£$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
+                                                    // so the £ is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
     srand(time(0)); // Seed the rand with the current time
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
-    fprintf(stdout, "Number of character sets: %u\n", number_of_rows);
     
     /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
     that a password must have upper case, lower case, numeric and a special characters */
@@ -130,11 +132,9 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
 char get_random_char(const char *character_set)
 {    
     size_t character_set_length = strlen(character_set);
-    fprintf(stdout, "character_set_length = %zu\n", character_set_length);
     int start_of_range = 0;
     int end_of_range = character_set_length - 1;
     int random_number = get_random_number(start_of_range, end_of_range);
-    fprintf(stdout, "random_number = %i\n", random_number);
     return *(character_set + random_number);
 }
 
