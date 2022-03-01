@@ -16,6 +16,7 @@
 long convert_command_line_argument(const char *argument, unsigned int command_line_index);
 char get_random_char(const char *character_set);
 int get_random_number(int start_of_range, int end_of_range);
+void shuffle(char arr[], int size);
 
 int main(int argc, char *argv[])
 {
@@ -50,8 +51,8 @@ int main(int argc, char *argv[])
     static const char *const character_sets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", // https://stackoverflow.com/questions/1200690/c-how-to-correctly-declare-an-array-of-strings
                                                     "abcdefghijklmnopqrstuvwxyz",
                                                     "0123456789",
-                                                    "!£$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
-                                                    // so the £ is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
+                                                    "!ï¿½$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
+                                                    // so the ï¿½ is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
     srand(time(0)); // Seed the rand with the current time
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
     
@@ -76,7 +77,9 @@ int main(int argc, char *argv[])
             *(password + position) = get_random_char(character_sets[random_character_set]);
         }
         *(password + position) = '\0';
-        fprintf(stdout, "%s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
+        // shuffle the password as the first 4 characters are always from the exact same character sets (in ascending order)
+        shuffle(password, strlen(password));
+        fprintf(stdout, "post-shuffle: %s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
     }
     // Stop measuring time and calculate the elapsed time
     // This will measure the wall clock on both Winodws & Linux, but only in full seconds.
@@ -147,4 +150,16 @@ char get_random_char(const char *character_set)
 int get_random_number(int start_of_range, int end_of_range)
 {
     return start_of_range + rand() / (RAND_MAX / (end_of_range - start_of_range + 1) + 1);
+}
+
+// https://www.codegrepper.com/code-examples/c/shuffle+function+in+c
+void shuffle(char arr[], int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        int j = rand() % size;
+        int t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+    }
 }
