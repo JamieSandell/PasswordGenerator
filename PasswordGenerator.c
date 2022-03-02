@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,7 @@
 long convert_command_line_argument(const char *argument, unsigned int command_line_index);
 char get_random_char(const char *character_set);
 int get_random_number(int start_of_range, int end_of_range);
+bool is_character_repeating_consecutively(const char characters[], size_t size);
 void shuffle(char arr[], int size);
 
 int main(int argc, char *argv[])
@@ -89,6 +91,10 @@ int main(int argc, char *argv[])
         *(password + position) = '\0';
         // shuffle the password as the first 4 characters are always from the exact same character sets (in ascending order)
         shuffle(password, strlen(password));
+        while (is_character_repeating_consecutively(password, password_length))
+        {
+            shuffle(password, password_length);
+        }
         fprintf(stdout, "%s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
     }
     // Stop measuring time and calculate the elapsed time
@@ -159,6 +165,22 @@ char get_random_char(const char *character_set)
 int get_random_number(int start_of_range, int end_of_range)
 {
     return start_of_range + rand() / (RAND_MAX / (end_of_range - start_of_range + 1) + 1);
+}
+
+bool is_character_repeating_consecutively(const char characters[], size_t size)
+{
+    if (size < 2)
+    {
+        return false;
+    }
+    for (size_t i = 2; i < size; ++i)
+    {
+        if (characters[i] == characters[i - 1])
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 /* Fisher-Yates*/
