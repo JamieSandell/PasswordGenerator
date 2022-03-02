@@ -161,14 +161,16 @@ int get_random_number(int start_of_range, int end_of_range)
     return start_of_range + rand() / (RAND_MAX / (end_of_range - start_of_range + 1) + 1);
 }
 
-// https://www.codegrepper.com/code-examples/c/shuffle+function+in+c
+/* Fisher-Yates*/
 void shuffle(char arr[], int size)
 {
-    for (int i = 0; i < size; ++i)
-    {
-        int j = rand() % size;
-        int t = arr[i];
-        arr[i] = arr[j];
-        arr[j] = t;
+    int i, j, tmp; // create local variables to hold values for shuffle
+
+    for (i = size - 1; i > 0; --i)
+    { // for loop to shuffle
+        j = rand() % (i + 1); //randomise j for shuffle with Fisher Yates
+        tmp = arr[j];
+        arr[j] = arr[i];
+        arr[i] = tmp;
     }
 }
