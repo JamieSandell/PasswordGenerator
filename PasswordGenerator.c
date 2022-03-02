@@ -1,3 +1,5 @@
+/* Thanks to Skeeto for the tips - https://www.reddit.com/r/C_Programming/comments/t48kp9/comment/hyxaugl/?utm_source=share&utm_medium=web2x&context=3 */
+
 #include <errno.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -21,7 +23,7 @@
 #define MAXIMUM_PASSWORDS_TO_GENERATE LONG_MAX
 
 long convert_command_line_argument(const char *argument, unsigned int command_line_index);
-char get_random_char(const char *character_set);
+int get_random_char(const char *character_set);
 int get_random_number(int start_of_range, int end_of_range);
 bool is_character_repeating_consecutively(const char characters[], size_t size);
 void shuffle(char arr[], int size);
@@ -59,8 +61,7 @@ int main(int argc, char *argv[])
     static const char *const character_sets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", // https://stackoverflow.com/questions/1200690/c-how-to-correctly-declare-an-array-of-strings
                                                     "abcdefghijklmnopqrstuvwxyz",
                                                     "0123456789",
-                                                    "!£$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
-                                                    // so the � is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
+                                                    "!\xa3$%^&*()`;:@'~#<>?,."}; // UTF-8 encoding for the £ symbol
     srand(__rdtsc()); /* https://stackoverflow.com/questions/7617587/is-there-an-alternative-to-using-time-to-seed-a-random-number-generation?noredirect=1&lq=1 
                             The instruction measures the total pseudo-cycles since the processor was powered on.
                             Given the high frequency of today's machines, it's extremely unlikely that two
@@ -79,23 +80,37 @@ int main(int argc, char *argv[])
     {
         for (position = 0; position < number_of_rows; ++position)
         {
-            *(password + position) = get_random_char(character_sets[position]);
+            password[position] = get_random_char(character_sets[position]);
         }
         // set the rest of the password
         int random_character_set;
         for (; position < password_length; ++position)
         {
             random_character_set = get_random_number(0, number_of_rows - 1);
-            *(password + position) = get_random_char(character_sets[random_character_set]);
+            password[position] = get_random_char(character_sets[random_character_set]);
         }
-        *(password + position) = '\0';
+        password[position] = '\0';
         // shuffle the password as the first 4 characters are always from the exact same character sets (in ascending order)
-        shuffle(password, strlen(password));
+        shuffle(password, password_length);
         while (is_character_repeating_consecutively(password, password_length))
         {
             shuffle(password, password_length);
+        }        
+        for (size_t index = 0; index < password_length; ++index) //comment this out if profiling how long to generate a password as printing is relatively slow
+        {
+            // Print the password (convert to UTF-8 format)
+            int c = password[index] & 255;
+            if (c < 0x80)
+            {
+                putchar(c);
+            }
+            else
+            {
+                putchar(0xc0 | (c >>   6));
+                putchar(0x80 | (c & 0x3f));
+            }            
         }
-        fprintf(stdout, "%s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
+        putchar('\n');
     }
     // Stop measuring time and calculate the elapsed time
     // This will measure the wall clock on both Winodws & Linux, but only in full seconds.
@@ -152,7 +167,7 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
 }
 
 // Gets a random character from the passed in pointer to a character set. The character set must be null terminated.
-char get_random_char(const char *character_set)
+int get_random_char(const char *character_set)
 {    
     size_t character_set_length = strlen(character_set);
     int start_of_range = 0;
