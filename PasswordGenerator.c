@@ -47,11 +47,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    char *password = (char *) malloc(MAXIMUM_PASSWORD_LENGTH + 1); // Allocate the memory for our password, + 1 for null terminating character
+    char password [MAXIMUM_PASSWORD_LENGTH + 1];
     static const char *const character_sets[] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZ", // https://stackoverflow.com/questions/1200690/c-how-to-correctly-declare-an-array-of-strings
                                                     "abcdefghijklmnopqrstuvwxyz",
                                                     "0123456789",
-                                                    "!�$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
+                                                    "!£$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
                                                     // so the � is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
     srand(time(0)); // Seed the rand with the current time
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
     /*time(&end);
     time_t elapsed = end - begin;
     fprintf(stdout, "Generated %ld %i character long passwords in %ld seconds.\n", number_of_passwords_to_generate, password_length, elapsed);*/
-    free(password); // Make sure we free what the dynamically allocated
 
     return EXIT_SUCCESS;
 }
