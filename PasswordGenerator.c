@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+// For __rdtsc
+#ifdef _WIN32
+#include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
 #define DEFAULT_PASSWORD_LENGTH 8
 #define DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE 10
@@ -53,7 +59,11 @@ int main(int argc, char *argv[])
                                                     "0123456789",
                                                     "!£$%^&*()`;:@'~#<>?,."}; // Make sure you use Windows 1252 (ANSI) encoding to save this file,
                                                     // so the � is encoded as a single byte. In UTF-8 it's encoded as two-bytes.
-    srand(time(0)); // Seed the rand with the current time
+    srand(__rdtsc()); /* https://stackoverflow.com/questions/7617587/is-there-an-alternative-to-using-time-to-seed-a-random-number-generation?noredirect=1&lq=1 
+                            The instruction measures the total pseudo-cycles since the processor was powered on.
+                            Given the high frequency of today's machines, it's extremely unlikely that two
+                            processors will return the same value even if they booted at the same time and are
+                            clocked at the same speed.*/
     unsigned int number_of_rows = sizeof(character_sets)/sizeof(character_sets[0]); // how many character sets?
     
     /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
