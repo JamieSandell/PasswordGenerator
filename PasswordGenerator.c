@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
         *(password + position) = '\0';
         // shuffle the password as the first 4 characters are always from the exact same character sets (in ascending order)
         shuffle(password, strlen(password));
-        fprintf(stdout, "post-shuffle: %s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
+        fprintf(stdout, "%s\n", password); // comment this out if profiling how long to generate a password as printing is relatively slow
     }
     // Stop measuring time and calculate the elapsed time
     // This will measure the wall clock on both Winodws & Linux, but only in full seconds.
