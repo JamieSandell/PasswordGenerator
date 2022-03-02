@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "PasswordGenerator 8 10 would generate 8 passwords of 10 character length.\n");
         return EXIT_FAILURE;
     }
-    int password_length = DEFAULT_PASSWORD_LENGTH;
+    unsigned int password_length = DEFAULT_PASSWORD_LENGTH;
     long number_of_passwords_to_generate = DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE;
     if (argc > 1)
     {        
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     /* Set the first four characters to the corresponding character set to satisfy, in a basic way,
     that a password must have upper case, lower case, numeric and a special characters, after that the remaining
     characters to generate are pulled at random from a random character set. */
-    int position;
+    unsigned int position;
     // Start measuring time - uncomment the time_t code to see how long it takes to generate
     /*time_t begin, end;
     time(&begin);*/
@@ -100,17 +100,17 @@ long convert_command_line_argument(const char *argument, unsigned int command_li
         For that purpose, you have to check the value of the end pointer, but you need to store a pointer to the original string. */
     if (errno != 0)
     {
-        fprintf(stderr, "Error: Converting command line argument %s to long.\n");
+        fprintf(stderr, "Error: Converting command line argument %s to long.\n", argument);
         return 0;
     }
     if (end_ptr == argument) // Point to the same starting address as the address of the input then no conversion was done
     {
-        fprintf(stderr, "Error: No converson of the command line argument %s was performed.\n");
+        fprintf(stderr, "Error: No converson of the command line argument %s was performed.\n", argument);
         return 0;
     }
     if (*end_ptr != '\0') // If we're not at the null termination then there's some of the input that wasn't converted
     {
-        fprintf(stderr, "Error: Not all of the command line argument %s was converted to long.\n");
+        fprintf(stderr, "Error: Not all of the command line argument %s was converted to long.\n", argument);
         return 0;
     }
     switch (command_line_index)
