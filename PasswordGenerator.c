@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 {
     if (argc > MAXIMUM_COMMAND_LINE_ARGUMENTS)
     {
-        fprintf(stdout, "Usage: PasswordGenerator a b, where:\n");
-        fprintf(stdout, "a is between %i and %i characters to generate (default is %i if no flags specified)\n", MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH, DEFAULT_PASSWORD_LENGTH);
-        fprintf(stdout, "b is the number of passwords to generate (default is %i)\n", DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE);
-        fprintf(stdout, "PasswordGenerator 8 10 would generate 8 passwords of 10 character length.\n");
+        fprintf(stderr, "Usage: PasswordGenerator a b, where:\n");
+        fprintf(stderr, "a is between %i and %i characters to generate (default is %i if no flags specified)\n", MINIMUM_PASSWORD_LENGTH, MAXIMUM_PASSWORD_LENGTH, DEFAULT_PASSWORD_LENGTH);
+        fprintf(stderr, "b is the number of passwords to generate (default is %i)\n", DEFAULT_NUMBER_OF_PASSWORDS_TO_GENERATE);
+        fprintf(stderr, "PasswordGenerator 8 10 would generate 8 passwords of 10 character length.\n");
         return EXIT_FAILURE;
     }
     int password_length = DEFAULT_PASSWORD_LENGTH;
