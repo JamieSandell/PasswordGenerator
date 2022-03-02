@@ -168,7 +168,7 @@ void shuffle(char arr[], int size)
 
     for (i = size - 1; i > 0; --i)
     { // for loop to shuffle
-        j = rand() % (i + 1); //randomise j for shuffle with Fisher Yates
+        j = rand() % (i + 1); //randomise j for shuffle with Fisher-Yates
         tmp = arr[j];
         arr[j] = arr[i];
         arr[i] = tmp;
